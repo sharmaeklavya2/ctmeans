@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 
     // cluster
 
-    CTMeans model(X, c, 2, max_t);
+    CTMeans model(X, c, 2, max_t, eps_t);
     start_clock = clock();
     double obj = model.cluster(reps, max_epochs, eps_obj, stderr, 3);
     end_clock = clock();

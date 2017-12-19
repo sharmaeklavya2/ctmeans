@@ -38,8 +38,9 @@ double CTMeans::step(bool update_centroids, bool store_u) {
     norms.reserve(c);
     for(int i=0; i<n; ++i) {
         us.reserve(c); indices.reserve(c);
-        double norms2sum = 0;
+        double norms2sum=0, norm12;
             // norms2sum = denominator of all U(i, j)
+            // norm12 = norm2 of a point to the nearest cluster
         nniter.set_point(X.begin_row(i), X.end_row(i));
 
         // get the first t norms and corresponding membership values
@@ -61,11 +62,19 @@ double CTMeans::step(bool update_centroids, bool store_u) {
                 // fprintf(stderr, "saw 0 norm\n");
                 break;
             }
+            double norm2 = std::pow(norm, mexp);
+            if(j == 0) {norm12 = norm2;}
+            double den_u = norms2sum + norm2;
+            double u_j = norm2 / den_u;
+            double u_1 = norm12 / den_u;
+            double v_1 = norm12 / (den_u + (c-j)*norm2);
+            if((u_1 - v_1 < eps_t) && u_j < eps_t) {
+                break;
+            }
             norms.push_back(norm);
             indices.push_back(index);
-            double norm2 = std::pow(norm, mexp);
             us.push_back(norm2);
-            norms2sum += norm2;
+            norms2sum = den_u;
         }
         for(unsigned i2=0; i2 < us.size(); ++i2) {
             us[i2] /= norms2sum;

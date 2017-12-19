@@ -11,6 +11,7 @@
 class CTMeans {
 private:
     int c, m, max_t, n, d;
+    double eps_t;
 public:
     typedef DenseMatrix Matrix;
     const Matrix& X;
@@ -22,8 +23,9 @@ public:
         const Matrix& _X,   // points to cluster
         int _c,             // number of clusters
         int _m,             // fuzzifier
-        int _max_t          // max number of clusters considered for a point
-    ): c(_c), m(_m), max_t(_max_t), n(_X.rows()), d(_X.cols()), X(_X), C(c, _X.cols()), minC(c, _X.cols()) {}
+        int _max_t,         // max number of clusters considered for a point
+        double _eps_t       // min membership required for a cluster
+    ): c(_c), m(_m), max_t(_max_t), n(_X.rows()), d(_X.cols()), eps_t(_eps_t), X(_X), C(c, _X.cols()), minC(c, _X.cols()) {}
 
     void init_centroids();  // initialize centroids randomly
 
