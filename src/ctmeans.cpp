@@ -7,7 +7,7 @@
 #include "ctmeans.h"
 #include "nniter.h"
 
-void CTMeans::init_centroids() {
+void CTMeans::init_centroids_rand() {
     for(int i=0; i<c; ++i) {
         int index = unsigned(rand()) % n;
         std::memcpy(C.begin_row(i), X.begin_row(index), d * sizeof(double));
@@ -122,7 +122,7 @@ double CTMeans::step(bool update_centroids, bool store_u) {
 double CTMeans::cluster(int reps, int max_epochs, double obj_tol, FILE* fp, int epoch_interval) {
     double minobj = std::numeric_limits<double>::infinity();
     for(int repi=1; repi <= reps; ++repi) {
-        init_centroids();
+        init_centroids_rand();
         double obj = std::numeric_limits<double>::infinity();
         int epochi;
         for(epochi=1; epochi <= max_epochs; ++epochi) {

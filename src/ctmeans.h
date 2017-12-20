@@ -27,7 +27,7 @@ public:
         double _eps_t       // min membership required for a cluster
     ): c(_c), m(_m), max_t(_max_t), n(_X.rows()), d(_X.cols()), eps_t(_eps_t), X(_X), C(c, _X.cols()), minC(c, _X.cols()) {}
 
-    void init_centroids();  // initialize centroids randomly
+    void init_centroids_rand();  // initialize centroids randomly
 
     double step(
         // run one iteration of CT-means. Return objective before centroids are updated
