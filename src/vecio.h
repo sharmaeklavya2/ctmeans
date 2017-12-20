@@ -1,3 +1,6 @@
+#ifndef _VECIO_H
+#define _VECIO_H
+
 #include <ostream>
 #include <vector>
 #include <cstdio>
@@ -14,6 +17,20 @@ void print(std::ostream& os, IterT begin, IterT end) {
         }
     }
     os << "]";
+}
+
+template<class IterT>
+void print(FILE* fp, IterT begin, IterT end) {
+    fprintf(fp, "[");
+    if(begin != end)
+    {
+        fprintf(fp, "%lf", double(*begin));
+        IterT it = begin; it++;
+        for(; it != end; ++it) {
+            fprintf(fp, ", %lf", double(*it));
+        }
+    }
+    fprintf(fp, "]");
 }
 
 template<class IterT>
@@ -79,3 +96,5 @@ void loadtxt(const char* fname, std::vector<T>& v) {
         fclose(fp);
     }
 }
+
+#endif  // _VECIO_H
