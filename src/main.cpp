@@ -95,7 +95,8 @@ int main(int argc, char* argv[]) {
     savetxt("var/labels.txt", labels.cbegin(), labels.cend());
     // savetxt("var/memberships.txt", U);
     savetxt("var/flatu.txt", flatu.cbegin(), flatu.cend());
-    printf("flatu size: %zd\n", flatu.size());
+    printf("flatu size: %zd, %lf, %lf\n", flatu.size(),
+        double(flatu.size())/n, double(flatu.size())/n/c);
     end_clock = clock();
     printf("Time to save: %lg\n", get_elapsed(start_clock, end_clock));
 
