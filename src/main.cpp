@@ -8,6 +8,7 @@
 #include "matrix.h"
 #include "ctmeans.h"
 #include "vecio.h"
+#include "kdtree.h"
 
 const char* usage = "ctmeans n_clusters [n_reps] [max_epochs] [eps_obj] [max_t] [eps_t] [seed]";
 
@@ -15,6 +16,37 @@ using namespace std;
 
 double get_elapsed(double start_clock, double end_clock) {
     return double(end_clock - start_clock) / CLOCKS_PER_SEC;
+}
+
+int test_kd_tree() {
+    int n=6, d=2;
+    Matrix X(n, d);
+    X(0, 0) = 2; X(0, 1) = 3;
+    X(1, 0) = 5; X(1, 1) = 4;
+    X(2, 0) = 9; X(2, 1) = 6;
+    X(3, 0) = 4; X(3, 1) = 7;
+    X(4, 0) = 8; X(4, 1) = 1;
+    X(5, 0) = 7; X(5, 1) = 2;
+    vector<int> v;
+    v.resize(n);
+    for(int i=0; i<n; ++i) {
+        v[i] = i;
+    }
+    KDNode* root = get_kd_tree(v.begin(), v.end(), X, 0, nullptr);
+    print_kd_tree(stdout, root, 0);
+    delete root;
+    return 0;
+
+    /* Expected output:
+
+KD(5, min=[2, 1], max=[9, 7])
+  KD(1, min=[2, 3], max=[5, 7])
+    KD(0, min=[2, 3], max=[2, 3])
+    KD(3, min=[4, 7], max=[4, 7])
+  KD(2, min=[8, 1], max=[9, 6])
+    KD(4, min=[8, 1], max=[8, 1])
+
+    */
 }
 
 int main(int argc, char* argv[]) {
