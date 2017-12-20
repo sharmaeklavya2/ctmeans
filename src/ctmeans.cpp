@@ -169,7 +169,7 @@ void CTMeans::get_labels(std::vector<int>& labels) const {
     }
 }
 
-void CTMeans::get_dense_U(DenseMatrix& U2) const {
+void CTMeans::get_dense_U(Matrix& U2) const {
     for(int i=0; i<n; ++i) {
         const std::vector<double>& us = U[i].first;
         const std::vector<int>& indices = U[i].second;

@@ -3,7 +3,7 @@
 
 #include "matrix.h"
 
-std::ostream& operator<<(std::ostream& os, const DenseMatrix& X) {
+std::ostream& operator<<(std::ostream& os, const Matrix& X) {
     const char indent[] = "\t";
     int m = X.rows(), n = X.cols();
     for(int i=0; i<m; ++i) {
@@ -16,7 +16,7 @@ std::ostream& operator<<(std::ostream& os, const DenseMatrix& X) {
     return os;
 }
 
-void output(FILE* fp, const DenseMatrix& X) {
+void output(FILE* fp, const Matrix& X) {
     const char indent[] = "\t";
     int m = X.rows(), n = X.cols();
     for(int i=0; i<m; ++i) {
@@ -28,7 +28,7 @@ void output(FILE* fp, const DenseMatrix& X) {
     }
 }
 
-void savetxt(const char* fname, const DenseMatrix& X) {
+void savetxt(const char* fname, const Matrix& X) {
     FILE* fp = fopen(fname, "w");
     if(fp == NULL) {
         perror("savetxt");
@@ -39,7 +39,7 @@ void savetxt(const char* fname, const DenseMatrix& X) {
     }
 }
 
-void input(FILE* fp, DenseMatrix& X) {
+void input(FILE* fp, Matrix& X) {
     MatrixElemType* data = X.data();
     int mn = X.size();
     for(int i=0; i<mn; ++i) {
@@ -47,7 +47,7 @@ void input(FILE* fp, DenseMatrix& X) {
     }
 }
 
-void loadtxt(const char* fname, DenseMatrix& X) {
+void loadtxt(const char* fname, Matrix& X) {
     FILE* fp = fopen(fname, "r");
     if(fp == NULL) {
         perror("loadtxt");

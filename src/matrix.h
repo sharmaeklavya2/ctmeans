@@ -7,7 +7,7 @@
 
 typedef double MatrixElemType;
 
-class DenseMatrix {
+class Matrix {
 private:
     int m, n, mn;
     MatrixElemType* a;
@@ -29,8 +29,8 @@ public:
     MatrixElemType* begin_row(int i) {return a + i*n;}
     MatrixElemType* end_row(int i) {return a + (i+1)*n;}
 
-    DenseMatrix(): m(0), n(0), mn(0), a(nullptr) {}
-    DenseMatrix(int _m, int _n, bool zero=false): m(_m), n(_n), mn(_m*_n) {
+    Matrix(): m(0), n(0), mn(0), a(nullptr) {}
+    Matrix(int _m, int _n, bool zero=false): m(_m), n(_n), mn(_m*_n) {
         if(mn) {
             if(zero) {
                 a = (MatrixElemType*)(std::calloc(mn, sizeof(MatrixElemType)));
@@ -41,25 +41,25 @@ public:
         }
         else {a = nullptr;}
     }
-    DenseMatrix(const DenseMatrix& X): m(X.m), n(X.n), mn(X.mn) {
+    Matrix(const Matrix& X): m(X.m), n(X.n), mn(X.mn) {
         if(mn) {
             a = (MatrixElemType*)(std::malloc(mn * sizeof(MatrixElemType)));
             std::memcpy(a, X.a, mn * sizeof(MatrixElemType));
         }
         else {a = nullptr;}
     }
-    ~DenseMatrix() {if(mn) {free(a);}}
-    void swap(DenseMatrix& X) {
+    ~Matrix() {if(mn) {free(a);}}
+    void swap(Matrix& X) {
         std::swap(m, X.m);
         std::swap(n, X.n);
         std::swap(mn, X.mn);
         std::swap(a, X.a);
     }
-    DenseMatrix& operator=(DenseMatrix X) {
+    Matrix& operator=(Matrix X) {
         swap(X);
         return *this;
     }
-    DenseMatrix(DenseMatrix&& X): DenseMatrix() {
+    Matrix(Matrix&& X): Matrix() {
         swap(X);
     }
 
@@ -79,15 +79,15 @@ public:
 
 namespace std {
     template <>
-    inline void swap(DenseMatrix& X, DenseMatrix& Y) {
+    inline void swap(Matrix& X, Matrix& Y) {
         X.swap(Y);
     }
 }
 
-std::ostream& operator<<(std::ostream&, const DenseMatrix&);
-void output(FILE*, const DenseMatrix&);
-void savetxt(const char*, const DenseMatrix&);
-void input(FILE*, DenseMatrix&);
-void loadtxt(const char*, DenseMatrix&);
+std::ostream& operator<<(std::ostream&, const Matrix&);
+void output(FILE*, const Matrix&);
+void savetxt(const char*, const Matrix&);
+void input(FILE*, Matrix&);
+void loadtxt(const char*, Matrix&);
 
 #endif  // _MATRIX_H

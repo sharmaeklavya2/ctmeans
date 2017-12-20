@@ -6,8 +6,6 @@
 #include <vector>
 #include "matrix.h"
 
-typedef DenseMatrix Matrix;
-
 class NNIterSort {
 private:
     int c, d;

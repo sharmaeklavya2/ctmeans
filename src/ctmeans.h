@@ -13,7 +13,6 @@ private:
     int c, m, max_t, n, d;
     double eps_t;
 public:
-    typedef DenseMatrix Matrix;
     const Matrix& X;
     Matrix C, minC;
     std::vector<std::pair<std::vector<double>, std::vector<int> > > U;
@@ -52,7 +51,7 @@ public:
     // get a descending-sorted vector containing all non-zero memberships
     void get_labels(std::vector<int>& labels) const;
     // for each point, get cluster number of cluster closest to it
-    void get_dense_U(DenseMatrix& U2) const;
+    void get_dense_U(Matrix& U2) const;
     // U2 should be initialized to 0
 };
 

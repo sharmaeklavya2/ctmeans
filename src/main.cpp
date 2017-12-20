@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
     fscanf(fp, "%d%d", &n, &d);
     fclose(fp);
 
-    DenseMatrix X(n, d);
+    Matrix X(n, d);
     clock_t start_clock = clock();
     loadtxt("var/in.txt", X);
     clock_t end_clock = clock();
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
     // write output
 
     start_clock = clock();
-    // DenseMatrix U(n, c, true);
+    // Matrix U(n, c, true);
     // model.get_dense_U(U);
     vector<int> labels;
     model.get_labels(labels);
