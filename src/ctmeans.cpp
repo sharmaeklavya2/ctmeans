@@ -28,12 +28,14 @@ void CTMeans::init_centroids_rand(RandEngT& reng) {
     }
 }
 
-double CTMeans::step(bool update_centroids, bool store_u) {
+double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_heap_ops) {
     using std::vector;
 
     double obj = 0.0;
+    int sigc = 0;
     #ifdef USE_KD
     NNIterKD nniter(C);
+    int heap_ops = 0;
     #else
     NNIterSort nniter(C);
     #endif
@@ -71,6 +73,7 @@ double CTMeans::step(bool update_centroids, bool store_u) {
             KDHeapElem heap_elem;
             do {
                 heap_elem = nniter.get_neighbor();
+                heap_ops++;
             } while(heap_elem.type != 'p');
             norm = heap_elem.prio;
             index = heap_elem.point;
@@ -112,6 +115,7 @@ double CTMeans::step(bool update_centroids, bool store_u) {
             fprintf(stderr, "\n");
         }
         */
+        sigc += us.size();
         for(unsigned i2=0; i2 < us.size(); ++i2) {
             us[i2] /= norms2sum;
         }
@@ -152,6 +156,14 @@ double CTMeans::step(bool update_centroids, bool store_u) {
         }
     }
 
+    if(p_sigc != nullptr) {
+        *p_sigc = sigc;
+    }
+    #ifdef USE_KD
+    if(p_heap_ops != nullptr) {
+        *p_heap_ops = heap_ops;
+    }
+    #endif
     return obj;
 }
 
@@ -160,11 +172,23 @@ double CTMeans::cluster(int reps, int max_epochs, double obj_tol, FILE* fp, int 
     std::minstd_rand reng(rand());
     for(int repi=1; repi <= reps; ++repi) {
         init_centroids_rand(reng);
+        SigC.push_back(std::vector<int>());
+        #ifdef GET_KD_HEAP_OPS
+        P.push_back(std::vector<int>());
+        #endif
         double obj = std::numeric_limits<double>::infinity();
         int epochi;
         for(epochi=1; epochi <= max_epochs; ++epochi) {
             double old_obj = obj;
-            obj = step(true, false);
+            int sigc;
+            #ifdef GET_KD_HEAP_OPS
+            int heap_ops;
+            obj = step(true, false, &sigc, &heap_ops);
+            P.back().push_back(heap_ops);
+            #else
+            obj = step(true, false, &sigc);
+            #endif
+            SigC.back().push_back(sigc);
             if(fp != nullptr && epochi % epoch_interval == 1) {
                 fprintf(fp, "ctmeans %d-%d: %lg\n", repi, epochi, obj);
             }

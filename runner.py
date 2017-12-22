@@ -67,5 +67,21 @@ def main():
         plt.plot(np.arange(0, flatu.shape[0]) / n, flatu)
         plt.show()
 
+    for fname in ('sigc.txt', 'heap_ops.txt'):
+        try:
+            L = []
+            with open(pjoin(vardir, fname)) as fobj:
+                for line in fobj:
+                    if line:
+                        L.append([float(x) for x in line.split()])
+        except FileNotFoundError:
+            L = None
+        if L is not None:
+            for l in L:
+                plt.plot(np.arange(0, len(l)), l, '-o')
+            plt.xlabel('epochs')
+            plt.ylabel(fname.split('.')[0])
+            plt.show()
+
 if __name__ == '__main__':
     main()

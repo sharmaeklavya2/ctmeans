@@ -85,6 +85,27 @@ int main() {
 }
 */
 
+void output_vec_vec_to_file(const char* fname, const char* name, int n, int c, const vector<vector<int> >& V) {
+    long long sum = 0;
+    int count = 0;
+    FILE* fp = fopen(fname, "w");
+    for(const vector<int>& v: V) {
+        if(v.size() > 0) {
+            count += v.size();
+            sum += v[0];
+            fprintf(fp, "%lf", double(v[0])/n);
+            for(unsigned i=1; i<v.size(); ++i) {
+                sum += v[i];
+                fprintf(fp, " %lf", double(v[i])/n);
+            }
+        }
+        fprintf(fp, "\n");
+    }
+    fclose(fp);
+    double avg = double(sum) / count;
+    printf("Average %s: %lf, %lf, %lf\n", name, avg, avg/n, avg/n/c);
+}
+
 int main(int argc, char* argv[]) {
     // parse command-line args
 
@@ -166,6 +187,11 @@ int main(int argc, char* argv[]) {
     printf("flatu size: %zd, %lf, %lf\n", flatu.size(),
         double(flatu.size())/n, double(flatu.size())/n/c);
     end_clock = clock();
+
+    output_vec_vec_to_file("var/sigc.txt", "SigC", n, c, model.SigC);
+    #ifdef USE_KD
+    output_vec_vec_to_file("var/heap_ops.txt", "heap_ops", n, c, model.P);
+    #endif
     printf("Time to save: %lg\n", get_elapsed(start_clock, end_clock));
 
     return 0;
