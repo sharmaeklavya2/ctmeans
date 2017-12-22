@@ -3,8 +3,8 @@
 #include "nniter.h"
 #include "matrix.h"
 
-void NNIterSort::set_point(const MatrixElemType* _x_beg, const MatrixElemType* _x_end) {
-    x_beg = _x_beg; x_end = _x_end;
+void NNIterSort::set_point(const MatrixElemType* _x_beg) {
+    x_beg = _x_beg;
     counter = 0;
     for(int i=0; i<c; ++i) {
         norms[i].second = i;

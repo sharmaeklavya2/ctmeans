@@ -12,15 +12,15 @@ private:
     int counter;
 public:
     Matrix C;
-    const MatrixElemType *x_beg, *x_end;
+    const MatrixElemType *x_beg;
 
     typedef std::pair<double, int> dipair;
     std::vector<dipair> norms;
 
     explicit NNIterSort(const Matrix& _C): c(_C.rows()), d(_C.cols()), counter(0),
-        C(_C), x_beg(nullptr), x_end(nullptr) {norms.resize(c);}
+        C(_C), x_beg(nullptr) {norms.resize(c);}
 
-    void set_point(const MatrixElemType*, const MatrixElemType*);
+    void set_point(const MatrixElemType*);
     dipair get_neighbor();
 };
 

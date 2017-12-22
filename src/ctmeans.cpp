@@ -51,7 +51,7 @@ double CTMeans::step(bool update_centroids, bool store_u) {
         double norms2sum=0, norm12;
             // norms2sum = denominator of all U(i, j)
             // norm12 = norm2 of a point to the nearest cluster
-        nniter.set_point(X.begin_row(i), X.end_row(i));
+        nniter.set_point(X.begin_row(i));
 
         // get the first t norms and corresponding membership values
         for(int j=0; j<max_t; ++j) {
