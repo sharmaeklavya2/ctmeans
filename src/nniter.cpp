@@ -23,6 +23,6 @@ typename NNIterSort::dipair NNIterSort::get_neighbor() {
         fprintf(stderr, "NNIterSort: counter overflow\n");
     }
     // return norms[counter++];
-    std::pop_heap(norms.begin(), norms.end() - counter);
+    std::pop_heap(norms.begin(), norms.end() - counter, std::greater<dipair>());
     return norms[c - (++counter)];
 }
