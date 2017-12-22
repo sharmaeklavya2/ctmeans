@@ -8,6 +8,10 @@
 
 #include "ctmeans.h"
 #include "nniter.h"
+#include "nniter_kd.h"
+#include "vecio.h"
+
+// #define USE_KD
 
 void CTMeans::init_centroids_rand() {
     for(int i=0; i<c; ++i) {
@@ -26,10 +30,13 @@ void CTMeans::init_centroids_rand(RandEngT& reng) {
 
 double CTMeans::step(bool update_centroids, bool store_u) {
     using std::vector;
-    typedef std::pair<double, int> dipair;
 
     double obj = 0.0;
+    #ifdef USE_KD
+    NNIterKD nniter(C);
+    #else
     NNIterSort nniter(C);
+    #endif
     double mexp = 1/(1-m);
     vector<double> usum;    // usum[j] = sum(U(i, j)^m for i in range(n))
     if(update_centroids) {
@@ -55,9 +62,20 @@ double CTMeans::step(bool update_centroids, bool store_u) {
 
         // get the first t norms and corresponding membership values
         for(int j=0; j<max_t; ++j) {
-            dipair norm_index = nniter.get_neighbor();
-            double norm = norm_index.first;
-            int index = norm_index.second;
+            double norm; int index;
+            #ifndef USE_KD
+            std::pair<double, int> norm_index = nniter.get_neighbor();
+            norm = norm_index.first;
+            index = norm_index.second;
+            #else
+            KDHeapElem heap_elem;
+            do {
+                heap_elem = nniter.get_neighbor();
+            } while(heap_elem.type != 'p');
+            norm = heap_elem.prio;
+            index = heap_elem.point;
+            #endif
+
             if(index < 0 || index >= c) {
                 fprintf(stderr, "step: i=%d, j=%d, index=%d\n", i, j, index);
             }
@@ -86,6 +104,14 @@ double CTMeans::step(bool update_centroids, bool store_u) {
             us.push_back(norm2);
             norms2sum = den_u;
         }
+        /*
+        if(i == 0) {
+            for(int j=0; j<norms.size(); ++j) {
+                fprintf(stderr, "%lg ", norms[j]);
+            }
+            fprintf(stderr, "\n");
+        }
+        */
         for(unsigned i2=0; i2 < us.size(); ++i2) {
             us[i2] /= norms2sum;
         }
