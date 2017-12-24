@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
         if(max_epochs <= 0) {max_epochs = 300;}
         if(eps_obj <= 0.0) {eps_obj = 0.0001;}
         if(max_t <= 0) {max_t = c;}
-        if(eps_t <= 0.0) {eps_t = 0.0001;}
+        if(eps_t <= 0.0) {eps_t = 0.0;}
         if(seed <= 0) {srand(time(NULL));}
     }
 

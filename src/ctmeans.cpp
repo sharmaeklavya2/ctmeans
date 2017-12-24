@@ -95,17 +95,19 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
             }
             double norm2 = std::pow(norm, mexp);
             if(j == 0) {norm12 = norm2;}
-            double den_u = norms2sum + norm2;
-            double u_j = norm2 / den_u;
-            double u_1 = norm12 / den_u;
-            double v_1 = norm12 / (den_u + (c-j)*norm2);
-            if((u_1 - v_1 < eps_t) && u_j < eps_t) {
-                break;
+            if(eps_t > 0.0) {
+                double den_u = norms2sum + norm2;
+                double u_j = norm2 / den_u;
+                double u_1 = norm12 / den_u;
+                double v_1 = norm12 / (den_u + (c-j)*norm2);
+                if((u_1 - v_1 < eps_t) && u_j < eps_t) {
+                    break;
+                }
             }
             norms.push_back(norm);
             indices.push_back(index);
             us.push_back(norm2);
-            norms2sum = den_u;
+            norms2sum += norm2;
         }
         /*
         if(i == 0) {
