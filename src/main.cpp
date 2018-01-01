@@ -203,3 +203,14 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
+/*
+#include "gen_gmix.h"
+
+int main() {
+    srand(time(NULL));
+    savetxt("secret/small.txt", gen_2d_gmix(10, 10, 30, 40, 5));
+    savetxt("secret/big.txt", gen_2d_gmix(100, 100, 3000, 40, 5));
+    return 0;
+}
+*/
