@@ -106,9 +106,16 @@ void output_vec_vec_to_file(const char* fname, const char* name, int n, int c, c
     printf("Average %s: %lf, %lf, %lf\n", name, avg, avg/n, avg/n/c);
 }
 
+#ifdef DEBUG
+#include <fenv.h>
+#endif
+
 int main(int argc, char* argv[]) {
     // parse command-line args
 
+#ifdef DEBUG
+    feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
+#endif
     int c, reps=0, max_epochs=0, max_t=0, seed=0;
     double eps_obj=0, eps_t=0;
 
