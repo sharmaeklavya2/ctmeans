@@ -152,8 +152,15 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
 
     if(update_centroids) {
         for(int j=0; j<c; ++j) {
-            for(int k=0; k<d; ++k) {
-                C(j, k) /= usum[j];
+            if(usum[j] == 0) {
+                for(int k=0; k<d; ++k) {
+                    C(j, k) = nniter.C(j, k);
+                }
+            }
+            else {
+                for(int k=0; k<d; ++k) {
+                    C(j, k) /= usum[j];
+                }
             }
         }
     }
