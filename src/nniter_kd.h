@@ -77,6 +77,7 @@ public:
     }
 
     KDHeapElem get_neighbor_node();
+    std::pair<double, int> get_neighbor();
 };
 
 #endif  // _NNITER_KD_H

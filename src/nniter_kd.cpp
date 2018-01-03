@@ -48,3 +48,14 @@ KDHeapElem NNIterKD::get_neighbor_node() {
     heap_ops++;
     return top;
 }
+
+std::pair<double, int> NNIterKD::get_neighbor() {
+    if(pq.empty()) {
+        std::fprintf(stderr, "NNIterKD: No neighbors left\n");
+    }
+    KDHeapElem heap_elem;
+    do {
+        heap_elem = get_neighbor_node();
+    } while(heap_elem.type != 'p');
+    return std::pair<double, int>(heap_elem.prio, heap_elem.point);
+}

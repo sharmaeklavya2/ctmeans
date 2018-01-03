@@ -65,18 +65,9 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
         // get the first t norms and corresponding membership values
         for(int j=0; j<max_t; ++j) {
             double norm; int index;
-            #ifndef USE_KD
             std::pair<double, int> norm_index = nniter.get_neighbor();
             norm = norm_index.first;
             index = norm_index.second;
-            #else
-            KDHeapElem heap_elem;
-            do {
-                heap_elem = nniter.get_neighbor_node();
-            } while(heap_elem.type != 'p');
-            norm = heap_elem.prio;
-            index = heap_elem.point;
-            #endif
 
             if(index < 0 || index >= c) {
                 fprintf(stderr, "step: i=%d, j=%d, index=%d\n", i, j, index);
