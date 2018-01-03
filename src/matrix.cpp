@@ -3,6 +3,28 @@
 
 #include "matrix.h"
 
+void Matrix::_init(int _m, int _n, bool zero) {
+    m = _m; n = _n, mn = _m * _n;
+    if(mn) {
+        if(zero) {
+            a = (MatrixElemType*)(std::calloc(mn, sizeof(MatrixElemType)));
+        }
+        else {
+            a = (MatrixElemType*)(std::malloc(mn * sizeof(MatrixElemType)));
+        }
+    }
+    else {a = nullptr;}
+}
+
+void Matrix::_init(const Matrix& X) {
+    m = X.m; n = X.n, mn = X.mn;
+    if(mn) {
+        a = (MatrixElemType*)(std::malloc(mn * sizeof(MatrixElemType)));
+        std::memcpy(a, X.a, mn * sizeof(MatrixElemType));
+    }
+    else {a = nullptr;}
+}
+
 std::ostream& operator<<(std::ostream& os, const Matrix& X) {
     const char indent[] = "\t";
     int m = X.rows(), n = X.cols();
