@@ -59,13 +59,7 @@ public:
 
     ~NNIterKD() {delete root; root = nullptr;}
     explicit NNIterKD(const Matrix& _C): C(_C), x_beg(nullptr) {
-        std::vector<int> v;
-        int n = C.rows();
-        v.resize(n);
-        for(int i=0; i<n; ++i) {
-            v[i] = i;
-        }
-        root = get_kd_tree(v.begin(), v.end(), C, 0, nullptr);
+        root = get_kd_tree(C);
     }
 
     void set_point(const double* _x_beg) {

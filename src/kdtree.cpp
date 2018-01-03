@@ -4,6 +4,16 @@
 #include "kdtree.h"
 #include "vecio.h"
 
+KDNode* get_kd_tree(const Matrix& X) {
+    std::vector<int> v;
+    int n = X.rows();
+    v.resize(n);
+    for(int i=0; i<n; ++i) {
+        v[i] = i;
+    }
+    return get_kd_tree(v.begin(), v.end(), X, 0, nullptr);
+}
+
 KDNode* get_kd_tree(
     std::vector<int>::iterator begin,
     std::vector<int>::iterator end,

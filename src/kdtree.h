@@ -34,6 +34,8 @@ public:
     void print_nl(FILE* fp) const;
 };
 
+KDNode* get_kd_tree(const Matrix& X);
+
 KDNode* get_kd_tree(std::vector<int>::iterator begin, std::vector<int>::iterator end,
     const Matrix& X, int depth, KDNode* parent);
 
