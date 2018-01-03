@@ -11,8 +11,6 @@
 #include "nniter_kd.h"
 #include "vecio.h"
 
-// #define USE_KD
-
 void CTMeans::init_centroids_rand() {
     for(int i=0; i<c; ++i) {
         int index = unsigned(rand()) % n;
@@ -28,18 +26,24 @@ void CTMeans::init_centroids_rand(RandEngT& reng) {
     }
 }
 
-double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_heap_ops) {
+double CTMeans::step(bool use_kd, bool update_centroids, bool store_u, int* p_sigc, int* p_heap_ops) {
     using std::vector;
 
     double obj = 0.0;
     int sigc = 0;
-    #ifdef USE_KD
-    NNIterKD nniter(C);
+    NNIterSort nniter;
+    NNIterKD nniter_kd;
     int heap_ops = 0;
-    #else
-    NNIterSort nniter(C);
-    #endif
     double mexp = 1/(1-m);
+
+    if(use_kd) {
+        nniter_kd.init(C);
+    }
+    else {
+        nniter.init(C);
+    }
+    const Matrix& nniter_C(use_kd? nniter_kd.C: nniter.C);
+
     vector<double> usum;    // usum[j] = sum(U(i, j)^m for i in range(n))
     if(update_centroids) {
         usum.resize(c, 0);
@@ -60,12 +64,23 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
         double norms2sum=0, norm12;
             // norms2sum = denominator of all U(i, j)
             // norm12 = norm2 of a point to the nearest cluster
-        nniter.set_point(X.begin_row(i));
+        if(use_kd) {
+            nniter_kd.set_point(X.begin_row(i));
+        }
+        else {
+            nniter.set_point(X.begin_row(i));
+        }
 
         // get the first t norms and corresponding membership values
         for(int j=0; j<max_t; ++j) {
             double norm; int index;
-            std::pair<double, int> norm_index = nniter.get_neighbor();
+            std::pair<double, int> norm_index;
+            if(use_kd) {
+                norm_index = nniter_kd.get_neighbor();
+            }
+            else {
+                norm_index = nniter.get_neighbor();
+            }
             norm = norm_index.first;
             index = norm_index.second;
 
@@ -108,9 +123,9 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
         }
         */
         sigc += us.size();
-        #ifdef USE_KD
-        heap_ops += nniter.get_heap_ops();
-        #endif
+        if(use_kd) {
+            heap_ops += nniter_kd.get_heap_ops();
+        }
         for(unsigned i2=0; i2 < us.size(); ++i2) {
             us[i2] /= norms2sum;
         }
@@ -147,7 +162,7 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
         for(int j=0; j<c; ++j) {
             if(usum[j] == 0) {
                 for(int k=0; k<d; ++k) {
-                    C(j, k) = nniter.C(j, k);
+                    C(j, k) = nniter_C(j, k);
                 }
             }
             else {
@@ -161,35 +176,33 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
     if(p_sigc != nullptr) {
         *p_sigc = sigc;
     }
-    #ifdef USE_KD
-    if(p_heap_ops != nullptr) {
-        *p_heap_ops = heap_ops;
+    if(use_kd) {
+        if(p_heap_ops != nullptr) {
+            *p_heap_ops = heap_ops;
+        }
     }
-    #endif
     return obj;
 }
 
-double CTMeans::cluster(int reps, int max_epochs, double obj_tol, FILE* fp, int epoch_interval) {
+double CTMeans::cluster(bool use_kd, int reps, int max_epochs, double obj_tol, FILE* fp, int epoch_interval) {
     double minobj = std::numeric_limits<double>::infinity();
     std::minstd_rand reng(rand());
     for(int repi=1; repi <= reps; ++repi) {
         init_centroids_rand(reng);
         SigC.push_back(std::vector<int>());
-        #ifdef GET_KD_HEAP_OPS
-        P.push_back(std::vector<int>());
-        #endif
+        if(use_kd) {
+            P.push_back(std::vector<int>());
+        }
         double obj = std::numeric_limits<double>::infinity();
         int epochi;
         for(epochi=1; epochi <= max_epochs; ++epochi) {
             double old_obj = obj;
             int sigc;
-            #ifdef GET_KD_HEAP_OPS
             int heap_ops;
-            obj = step(true, false, &sigc, &heap_ops);
-            P.back().push_back(heap_ops);
-            #else
-            obj = step(true, false, &sigc);
-            #endif
+            obj = step(use_kd, true, false, &sigc, &heap_ops);
+            if(use_kd) {
+                P.back().push_back(heap_ops);
+            }
             SigC.back().push_back(sigc);
             if(fp != nullptr && epochi % epoch_interval == 1) {
                 fprintf(fp, "ctmeans %d-%d: %lg\n", repi, epochi, obj);
@@ -205,7 +218,7 @@ double CTMeans::cluster(int reps, int max_epochs, double obj_tol, FILE* fp, int 
         }
     }
     C = minC;
-    minobj = step(false, true);
+    minobj = step(use_kd, false, true);
     return minobj;
 }
 

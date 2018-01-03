@@ -8,10 +8,6 @@
 
 #include "matrix.h"
 
-#ifdef USE_KD
-#define GET_KD_HEAP_OPS
-#endif
-
 class CTMeans {
 private:
     int c, m, max_t, n, d;
@@ -21,9 +17,7 @@ public:
     Matrix C, minC;
     std::vector<std::pair<std::vector<double>, std::vector<int> > > U;
     std::vector<std::vector<int> > SigC;
-#ifdef GET_KD_HEAP_OPS
     std::vector<std::vector<int> > P;
-#endif
 
 public:
     CTMeans(
@@ -41,6 +35,7 @@ public:
 
     double step(
         // run one iteration of CT-means. Return objective before centroids are updated
+        bool use_kd,            // use KD-trees to accelerate nearest neighbor search
         bool update_centroids,  // whether centroids matrix C should be updated
         bool store_u,          // whether membership matrix should be stored in U
         int* p_sigc=nullptr,
@@ -52,6 +47,7 @@ public:
             Store the best C in minC.
             Return objective before the last centroids update
         */
+        bool use_kd,            // use KD-trees to accelerate nearest neighbor search
         int reps=10,            // number of random initializations to start with
         int epochs=300,         // number of iterations in each run of CT-means
         double obj_tol=0.0001,  // relative reduction threshold for termination

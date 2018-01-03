@@ -11,7 +11,7 @@
 #include "kdtree.h"
 #include "nniter_kd.h"
 
-const char* usage = "ctmeans n_clusters [n_reps] [max_epochs] [eps_obj] [max_t] [eps_t] [seed]";
+const char* usage = "ctmeans n_clusters [n_reps] [use_kd] [max_epochs] [eps_obj] [max_t] [eps_t] [seed]";
 
 using namespace std;
 
@@ -118,25 +118,28 @@ int main(int argc, char* argv[]) {
 #endif
     int c, reps=0, max_epochs=0, max_t=0, seed=0;
     double eps_obj=0, eps_t=0;
+    bool use_kd = true;
 
-    if(argc < 2 || argc > 8) {
+    if(argc < 2 || argc > 9) {
         fprintf(stderr, "usage: %s\n", usage);
         return 1;
     }
     else {
         c = atoi(argv[1]);
         switch(argc) {
-        case 8:
-            seed = atoi(argv[7]);
+        case 9:
+            seed = atoi(argv[8]);
             srand(seed);
+        case 8:
+            eps_t = atof(argv[7]);
         case 7:
-            eps_t = atof(argv[6]);
+            max_t = atoi(argv[6]);
         case 6:
-            max_t = atoi(argv[5]);
+            eps_obj = atof(argv[5]);
         case 5:
-            eps_obj = atof(argv[4]);
+            max_epochs = atoi(argv[4]);
         case 4:
-            max_epochs = atoi(argv[3]);
+            use_kd = bool(atoi(argv[3]));
         case 3:
             reps = atoi(argv[2]);
         }
@@ -172,7 +175,7 @@ int main(int argc, char* argv[]) {
 
     CTMeans model(X, c, 2, max_t, eps_t);
     start_clock = clock();
-    double obj = model.cluster(reps, max_epochs, eps_obj, stderr, 3);
+    double obj = model.cluster(use_kd, reps, max_epochs, eps_obj, stderr, 3);
     end_clock = clock();
     printf("Objective: %lg\n", obj);
     printf("Time to cluster: %lg\n", get_elapsed(start_clock, end_clock));
@@ -196,9 +199,9 @@ int main(int argc, char* argv[]) {
     end_clock = clock();
 
     output_vec_vec_to_file("var/sigc.txt", "SigC", n, c, model.SigC);
-    #ifdef USE_KD
-    output_vec_vec_to_file("var/heap_ops.txt", "heap_ops", n, c, model.P);
-    #endif
+    if(use_kd) {
+        output_vec_vec_to_file("var/heap_ops.txt", "heap_ops", n, c, model.P);
+    }
     printf("Time to save: %lg\n", get_elapsed(start_clock, end_clock));
 
     return 0;
