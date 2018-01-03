@@ -5,6 +5,7 @@
 #include <utility>
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 
 typedef double MatrixElemType;
 
@@ -31,7 +32,8 @@ public:
     MatrixElemType* end_row(int i) {return a + (i+1)*n;}
 
     Matrix(): m(0), n(0), mn(0), a(nullptr) {}
-    Matrix(int _m, int _n, bool zero=false): m(_m), n(_n), mn(_m*_n) {
+    void _init(int _m, int _n, bool zero=false) {
+        m = _m; n = _n, mn = _m * _n;
         if(mn) {
             if(zero) {
                 a = (MatrixElemType*)(std::calloc(mn, sizeof(MatrixElemType)));
@@ -42,14 +44,33 @@ public:
         }
         else {a = nullptr;}
     }
-    Matrix(const Matrix& X): m(X.m), n(X.n), mn(X.mn) {
+    void _init(const Matrix& X) {
+        m = X.m; n = X.n, mn = X.mn;
         if(mn) {
             a = (MatrixElemType*)(std::malloc(mn * sizeof(MatrixElemType)));
             std::memcpy(a, X.a, mn * sizeof(MatrixElemType));
         }
         else {a = nullptr;}
     }
+    Matrix(int _m, int _n, bool zero=false) {_init(_m, _n, zero);}
+    Matrix(const Matrix& X) {_init(X);}
+    void init(int _m, int _n, bool zero=false) {
+        if(mn == 0) {_init(_m, _n, zero);}
+        else {fprintf(stderr, "matrix: reinit attempt\n");}
+    }
+    void init(const Matrix& X) {
+        if(mn == 0) {_init(X);}
+        else {fprintf(stderr, "matrix: reinit attempt\n");}
+    }
     ~Matrix() {if(mn) {free(a);}}
+    void _destroy() {
+        if(mn) {
+            free(a);
+            a = nullptr;
+        }
+        m = n = mn = 0;
+    }
+
     void swap(Matrix& X) {
         std::swap(m, X.m);
         std::swap(n, X.n);
