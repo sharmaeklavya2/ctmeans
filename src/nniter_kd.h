@@ -64,6 +64,11 @@ public:
     int get_counter() const {return counter;}
 
     ~NNIterKD() {delete root; root = nullptr;}
+    NNIterKD(): root(nullptr), x_beg(nullptr) {}
+    void init(const Matrix& _C) {
+        C.init(_C);
+        root = get_kd_tree(C);
+    }
     explicit NNIterKD(const Matrix& _C): C(_C), x_beg(nullptr) {
         root = get_kd_tree(C);
     }
