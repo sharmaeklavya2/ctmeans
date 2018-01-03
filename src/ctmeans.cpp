@@ -72,8 +72,7 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
             #else
             KDHeapElem heap_elem;
             do {
-                heap_elem = nniter.get_neighbor();
-                heap_ops++;
+                heap_elem = nniter.get_neighbor_node();
             } while(heap_elem.type != 'p');
             norm = heap_elem.prio;
             index = heap_elem.point;
@@ -118,6 +117,9 @@ double CTMeans::step(bool update_centroids, bool store_u, int* p_sigc, int* p_he
         }
         */
         sigc += us.size();
+        #ifdef USE_KD
+        heap_ops += nniter.get_heap_ops();
+        #endif
         for(unsigned i2=0; i2 < us.size(); ++i2) {
             us[i2] /= norms2sum;
         }

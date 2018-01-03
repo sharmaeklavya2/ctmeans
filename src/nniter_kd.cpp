@@ -27,7 +27,7 @@ double point_range_norm(int d, const double* p, const double* rmin, const double
     return res;
 }
 
-KDHeapElem NNIterKD::get_neighbor() {
+KDHeapElem NNIterKD::get_neighbor_node() {
     if(pq.empty()) {
         std::fprintf(stderr, "NNIterKD: No neighbors left\n");
     }
@@ -42,5 +42,9 @@ KDHeapElem NNIterKD::get_neighbor() {
             pq.emplace(top.kdnode->right, C, x_beg);
         }
     }
+    else if(top.type == 'p') {
+        counter++;
+    }
+    heap_ops++;
     return top;
 }

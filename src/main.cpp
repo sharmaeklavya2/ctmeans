@@ -58,7 +58,7 @@ KD(5, min=[2, 1], max=[9, 7])
         nniter.set_point(p.data());
 
         for(int i=0; !nniter.pq.empty(); ++i) {
-            he = nniter.get_neighbor();
+            he = nniter.get_neighbor_node();
             he.print(stdout);
         }
     }

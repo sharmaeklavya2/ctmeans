@@ -51,11 +51,17 @@ inline bool operator<(const KDHeapElem& x, const KDHeapElem& y) {
 typedef std::priority_queue<KDHeapElem> KDPQ;
 
 class NNIterKD {
+protected:
+    int heap_ops;
+    int counter;
 public:
     KDPQ pq;
     Matrix C;
     KDNode* root;
     const double* x_beg;
+
+    int get_heap_ops() const {return heap_ops;}
+    int get_counter() const {return counter;}
 
     ~NNIterKD() {delete root; root = nullptr;}
     explicit NNIterKD(const Matrix& _C): C(_C), x_beg(nullptr) {
@@ -66,9 +72,11 @@ public:
         x_beg = _x_beg;
         pq = KDPQ();
         pq.emplace(root, C, x_beg);
+        heap_ops = 0;
+        counter = 0;
     }
 
-    KDHeapElem get_neighbor();
+    KDHeapElem get_neighbor_node();
 };
 
 #endif  // _NNITER_KD_H

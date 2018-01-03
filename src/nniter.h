@@ -7,7 +7,7 @@
 #include "matrix.h"
 
 class NNIterSort {
-private:
+protected:
     int c, d;
     int counter;
 public:
@@ -16,6 +16,8 @@ public:
 
     typedef std::pair<double, int> dipair;
     std::vector<dipair> norms;
+
+    int get_counter() const {return counter;}
 
     explicit NNIterSort(const Matrix& _C): c(_C.rows()), d(_C.cols()), counter(0),
         C(_C), x_beg(nullptr) {norms.resize(c);}
