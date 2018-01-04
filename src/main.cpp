@@ -51,7 +51,10 @@ KD(5, min=[2, 1], max=[9, 7])
         vector<double> p;
         for(int i=0; i<d; ++i) {
             double p_i;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
             scanf("%lf", &p_i);
+#pragma GCC diagnostic pop
             p.push_back(p_i);
         }
 
@@ -162,7 +165,10 @@ int main(int argc, char* argv[]) {
         perror("main: couldn't read shape");
         return 1;
     }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
     fscanf(fp, "%d%d", &n, &d);
+#pragma GCC diagnostic pop
     fclose(fp);
 
     Matrix X(n, d);

@@ -65,7 +65,10 @@ void input(FILE* fp, Matrix& X) {
     MatrixElemType* data = X.data();
     int mn = X.size();
     for(int i=0; i<mn; ++i) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
         fscanf(fp, "%lf", data+i);
+#pragma GCC diagnostic pop
     }
 }
 
