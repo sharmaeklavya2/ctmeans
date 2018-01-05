@@ -10,9 +10,11 @@ from os.path import join as pjoin
 import shutil
 import argparse
 import subprocess
-from timer import Timer
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(pjoin(BASE_DIR, 'scripts'))
+
+from timer import Timer
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)

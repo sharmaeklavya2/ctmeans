@@ -8,15 +8,18 @@ and output centroids in var/centroids.txt
 
 from __future__ import print_function
 
+import sys
 import os
 from os.path import join as pjoin
 import argparse
 
 import numpy as np
 import sklearn.cluster
-from timer import Timer
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(pjoin(BASE_DIR, 'scripts'))
+
+from timer import Timer
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
