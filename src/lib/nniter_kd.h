@@ -37,6 +37,10 @@ public:
     void print(FILE* fp) const {
         fprintf(fp, "KDHeapElem(type=%c, point=%d, prio=%lf)\n", type, point, prio);
     }
+
+    bool operator==(const KDHeapElem& he) const {
+        return point == he.point && type == he.type && prio == he.prio;
+    }
 };
 
 inline bool operator<(const KDHeapElem& x, const KDHeapElem& y) {
