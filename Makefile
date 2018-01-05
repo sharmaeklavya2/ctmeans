@@ -29,7 +29,7 @@ $(MAIN_OUTPUT): $(BUILDDIR)/$(MAIN_OUTPUT)
 	ln -nsf $(BUILDDIR)/$(MAIN_OUTPUT) $(MAIN_OUTPUT)
 
 .PHONY: all
-all: $(MAIN_OUTPUT) test;
+all: $(MAIN_OUTPUT) $(BUILDDIR)/gen_gmix test;
 
 .PHONY: clean
 clean:
@@ -43,7 +43,7 @@ clean:
 COMMON_HEADERS := $(LIB_SRCDIR)/matrix.h $(LIB_SRCDIR)/vecio.h
 
 LIB_OBJS := $(LIB_BUILDDIR)/ctmeans.o $(LIB_BUILDDIR)/kdtree.o $(LIB_BUILDDIR)/matrix.o \
-	$(LIB_BUILDDIR)/gen_gmix.o $(LIB_BUILDDIR)/nniter.o $(LIB_BUILDDIR)/nniter_kd.o
+	$(LIB_BUILDDIR)/nniter.o $(LIB_BUILDDIR)/nniter_kd.o
 
 $(LIB_BUILDDIR)/matrix.o: $(LIB_SRCDIR)/matrix.cpp $(COMMON_HEADERS)
 	@mkdir -p $(LIB_BUILDDIR)
@@ -62,10 +62,6 @@ $(LIB_BUILDDIR)/nniter_kd.o: $(LIB_SRCDIR)/nniter_kd.cpp $(LIB_SRCDIR)/nniter_kd
 	@mkdir -p $(LIB_BUILDDIR)
 	$(CXX) -c $< -o $@
 
-$(LIB_BUILDDIR)/gen_gmix.o: $(LIB_SRCDIR)/gen_gmix.cpp $(COMMON_HEADERS)
-	@mkdir -p $(LIB_BUILDDIR)
-	$(CXX) -c $< -o $@
-
 $(LIB_BUILDDIR)/ctmeans.o: $(LIB_SRCDIR)/ctmeans.cpp $(LIB_HEADERS)
 	@mkdir -p $(LIB_BUILDDIR)
 	$(CXX) -c $< -o $@
@@ -76,8 +72,15 @@ $(BUILDDIR)/main.o: src/main.cpp $(LIB_HEADERS)
 	@mkdir -p $(BUILDDIR)
 	$(CXX) -c $< -o $@
 
+$(BUILDDIR)/gen_gmix.o: src/gen_gmix.cpp $(COMMON_HEADERS)
+	@mkdir -p $(BUILDDIR)
+	$(CXX) -c $< -o $@
+
 $(BUILDDIR)/$(MAIN_OUTPUT): $(LIB_OBJS) $(BUILDDIR)/main.o
-	$(CXX) $^ -o $(BUILDDIR)/$(MAIN_OUTPUT)
+	$(CXX) $^ -o $@
+
+$(BUILDDIR)/gen_gmix: $(BUILDDIR)/gen_gmix.o $(LIB_BUILDDIR)/matrix.o
+	$(CXX) $^ -o $@
 
 # Tests
 

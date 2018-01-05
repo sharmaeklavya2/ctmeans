@@ -1,10 +1,12 @@
+#include <cstdio>
 #include <cmath>
 #include <cstdlib>
+#include <ctime>
 #include <set>
 #include <vector>
 #include <random>
 
-#include "matrix.h"
+#include "lib/matrix.h"
 
 void get_rand_perm(long long n, int k, std::vector<int>& v) {
     // get a list of k distinct numbers in the range [0, n-1].
@@ -51,4 +53,30 @@ Matrix gen_2d_gmix(int m, int n, int c, int t, double stddev) {
         }
     }
     return X;
+}
+
+const char usage[] = "gen_gmix fname m n c t stddev [seed]";
+
+using namespace std;
+
+int main(int argc, char* argv[]) {
+    if(argc < 7 || argc > 8) {
+        fprintf(stderr, "%s\n", usage);
+        return 2;
+    }
+    const char* fname = argv[1];
+    int m = atoi(argv[2]);
+    int n = atoi(argv[3]);
+    int c = atoi(argv[4]);
+    int t = atoi(argv[5]);
+    double stddev = atof(argv[6]);
+    if(argc == 8) {
+        srand(atoi(argv[7]));
+    }
+    else {
+        srand(time(nullptr));
+    }
+
+    savetxt(fname, gen_2d_gmix(m, n, c, t, stddev));
+    return 0;
 }
