@@ -1,6 +1,5 @@
 #include <iostream>
 #include <algorithm>
-#include <functional>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -8,8 +7,6 @@
 #include "lib/matrix.h"
 #include "lib/ctmeans.h"
 #include "lib/vecio.h"
-#include "lib/kdtree.h"
-#include "lib/nniter_kd.h"
 
 const char* usage = "ctmeans n_clusters [n_reps] [use_kd] [max_epochs] [eps_obj] [max_t] [eps_t] [seed]";
 
@@ -18,75 +15,6 @@ using namespace std;
 double get_elapsed(double start_clock, double end_clock) {
     return double(end_clock - start_clock) / CLOCKS_PER_SEC;
 }
-
-int test_nniter_kd() {
-    int n=6, d=2;
-    Matrix X(n, d);
-    X(0, 0) = 2; X(0, 1) = 3;
-    X(1, 0) = 5; X(1, 1) = 4;
-    X(2, 0) = 9; X(2, 1) = 6;
-    X(3, 0) = 4; X(3, 1) = 7;
-    X(4, 0) = 8; X(4, 1) = 1;
-    X(5, 0) = 7; X(5, 1) = 2;
-
-    NNIterKD nniter(X);
-
-    print_kd_tree(stdout, nniter.root, 0);
-
-    /* Expected output:
-
-KD(5, min=[2, 1], max=[9, 7])
-  KD(1, min=[2, 3], max=[5, 7])
-    KD(0, min=[2, 3], max=[2, 3])
-    KD(3, min=[4, 7], max=[4, 7])
-  KD(2, min=[8, 1], max=[9, 6])
-    KD(4, min=[8, 1], max=[8, 1])
-
-    */
-
-    KDHeapElem he;
-
-    while(true) {
-        fprintf(stderr, "Enter a point: ");
-        vector<double> p;
-        for(int i=0; i<d; ++i) {
-            double p_i;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-            scanf("%lf", &p_i);
-#pragma GCC diagnostic pop
-            p.push_back(p_i);
-        }
-
-        nniter.set_point(p.data());
-
-        for(int i=0; !nniter.pq.empty(); ++i) {
-            he = nniter.get_neighbor_node();
-            he.print(stdout);
-        }
-    }
-
-    /*
-    Expected output for input "6 4":
-
-KDHeapElem(type=k, point=5, prio=0)
-KDHeapElem(type=k, point=1, prio=1)
-KDHeapElem(type=p, point=1, prio=1)
-KDHeapElem(type=k, point=2, prio=4)
-KDHeapElem(type=p, point=5, prio=5)
-KDHeapElem(type=p, point=2, prio=13)
-KDHeapElem(type=p, point=3, prio=13)
-KDHeapElem(type=p, point=4, prio=13)
-KDHeapElem(type=p, point=0, prio=17)
-    */
-    return 0;
-}
-
-/*
-int main() {
-    test_nniter_kd();
-}
-*/
 
 void output_vec_vec_to_file(const char* fname, const char* name, int n, int c, const vector<vector<int> >& V) {
     long long sum = 0;
