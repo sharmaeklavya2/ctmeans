@@ -1,5 +1,5 @@
-SOURCES = src/*.cpp
-HEADERS = src/*.h
+LIB_SOURCES = src/lib/*.cpp
+LIB_HEADERS = src/lib/*.h
 
 COMMON_FLAGS = -std=c++11 -Wall -Wpedantic #-Wno-sign-compare
 DEBUG_FLAGS = -D DEBUG -g $(COMMON_FLAGS)
@@ -25,8 +25,8 @@ all: $(BUILDDIR)/$(MAIN_OUTPUT)
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
-$(BUILDDIR)/$(MAIN_OUTPUT): $(SOURCES) $(HEADERS) $(BUILDDIR)
-	g++ $(FLAGS) $(SOURCES) -o $(BUILDDIR)/$(MAIN_OUTPUT)
+$(BUILDDIR)/$(MAIN_OUTPUT): $(LIB_SOURCES) $(LIB_HEADERS) src/main.cpp $(BUILDDIR)
+	g++ $(FLAGS) $(LIB_SOURCES) src/main.cpp -o $(BUILDDIR)/$(MAIN_OUTPUT)
 
 .PHONY: clean
 clean:

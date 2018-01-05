@@ -5,11 +5,11 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "matrix.h"
-#include "ctmeans.h"
-#include "vecio.h"
-#include "kdtree.h"
-#include "nniter_kd.h"
+#include "lib/matrix.h"
+#include "lib/ctmeans.h"
+#include "lib/vecio.h"
+#include "lib/kdtree.h"
+#include "lib/nniter_kd.h"
 
 const char* usage = "ctmeans n_clusters [n_reps] [use_kd] [max_epochs] [eps_obj] [max_t] [eps_t] [seed]";
 
