@@ -34,7 +34,7 @@ def main():
         vardir = pjoin(BASE_DIR, 'var')
         shutil.rmtree(vardir, ignore_errors=True)
         os.makedirs(vardir, exist_ok=True)
-        shutil.copyfile(args.dataset, pjoin(vardir, 'in.txt'))
+        os.symlink(os.path.abspath(args.dataset), pjoin(vardir, 'in.txt'))
         X = np.loadtxt(args.dataset)
         n, d = X.shape
         with open(pjoin(vardir, 'in.shape.txt'), 'w') as fobj:
