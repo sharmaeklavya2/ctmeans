@@ -7,11 +7,13 @@
 #include <vector>
 #include <string>
 
+#include <unistd.h>
+
 #include "lib/matrix.h"
 #include "lib/ctmeans.h"
 #include "lib/vecio.h"
 
-const char* usage = "ctmeans n_clusters [n_reps] [use_kd] [max_epochs] [eps_obj] [max_t] [eps_t] [seed]";
+const char* usage = "ctmeans directory n_clusters [n_reps] [use_kd] [max_epochs] [eps_obj] [max_t] [eps_t] [seed]";
 
 using namespace std;
 
@@ -111,28 +113,30 @@ int main(int argc, char* argv[]) {
     int c, reps=0, max_epochs=0, max_t=0, seed=0;
     double eps_obj=0, eps_t=0;
     bool use_kd = true;
+    const char* directory = nullptr;
 
-    if(argc < 2 || argc > 9) {
+    if(argc < 3 || argc > 10) {
         fprintf(stderr, "usage: %s\n", usage);
-        return 1;
+        return 2;
     }
     else {
-        c = atoi(argv[1]);
+        directory = argv[1];
+        c = atoi(argv[2]);
         switch(argc) {
+        case 10:
+            seed = atoi(argv[9]);
         case 9:
-            seed = atoi(argv[8]);
+            eps_t = atof(argv[8]);
         case 8:
-            eps_t = atof(argv[7]);
+            max_t = atoi(argv[7]);
         case 7:
-            max_t = atoi(argv[6]);
+            eps_obj = atof(argv[6]);
         case 6:
-            eps_obj = atof(argv[5]);
+            max_epochs = atoi(argv[5]);
         case 5:
-            max_epochs = atoi(argv[4]);
+            use_kd = bool(atoi(argv[4]));
         case 4:
-            use_kd = bool(atoi(argv[3]));
-        case 3:
-            reps = atoi(argv[2]);
+            reps = atoi(argv[3]);
         }
 
         if(reps <= 0) {reps = 1;}
@@ -144,11 +148,16 @@ int main(int argc, char* argv[]) {
     }
     srand(seed);
 
+    if(chdir(directory) != 0) {
+        perror("main: couldn't change directory");
+        return 1;
+    }
+
     FILE* fp = NULL;
 
     // store cmd args
 
-    fp = fopen("var/args.json", "w");
+    fp = fopen("args.json", "w");
     if(fp == nullptr) {
         perror("main: couldn't write args to file");
     }
@@ -165,7 +174,7 @@ int main(int argc, char* argv[]) {
 
     int n, d;
 
-    fp = fopen("var/in.shape.txt", "r");
+    fp = fopen("in.shape.txt", "r");
     if(fp == NULL) {
         perror("main: couldn't read shape");
         return 1;
@@ -178,7 +187,7 @@ int main(int argc, char* argv[]) {
 
     Matrix X(n, d);
     clock_t start_clock = clock();
-    loadtxt("var/in.txt", X);
+    loadtxt("in.txt", X);
     clock_t end_clock = clock();
     double time_to_load_data = get_elapsed(start_clock, end_clock);
     printf("Time to load data: %lg\n", time_to_load_data);
@@ -203,19 +212,19 @@ int main(int argc, char* argv[]) {
     vector<double> flatu;
     model.get_flat_U(flatu);
 
-    savetxt("var/centroids.txt", model.C);
-    savetxt("var/labels.txt", labels.cbegin(), labels.cend());
-    // savetxt("var/memberships.txt", U);
-    savetxt("var/flatu.txt", flatu.cbegin(), flatu.cend());
+    savetxt("centroids.txt", model.C);
+    savetxt("labels.txt", labels.cbegin(), labels.cend());
+    // savetxt("memberships.txt", U);
+    savetxt("flatu.txt", flatu.cbegin(), flatu.cend());
     printf("flatu size: %zd, %lf, %lf\n", flatu.size(),
         double(flatu.size())/n, double(flatu.size())/n/c);
     end_clock = clock();
 
-    double avg_sigC = output_vec_vec_to_file("var/sigc.txt", "SigC", n, c, model.SigC);
+    double avg_sigC = output_vec_vec_to_file("sigc.txt", "SigC", n, c, model.SigC);
     printf("Average %s: %lf, %lf, %lf\n", "SigC", avg_sigC, avg_sigC/n, avg_sigC/n/c);
     double avg_heap_ops = 0;
     if(use_kd) {
-        avg_heap_ops = output_vec_vec_to_file("var/heap_ops.txt", "heap_ops", n, c, model.P);
+        avg_heap_ops = output_vec_vec_to_file("heap_ops.txt", "heap_ops", n, c, model.P);
         printf("Average %s: %lf, %lf, %lf\n", "heap_ops", avg_heap_ops, avg_heap_ops/n, avg_heap_ops/n/c);
     }
     double time_to_save = get_elapsed(start_clock, end_clock);
@@ -223,7 +232,7 @@ int main(int argc, char* argv[]) {
 
     // write times
 
-    fp = fopen("var/times.json", "w");
+    fp = fopen("times.json", "w");
     if(fp == nullptr) {
         perror("main: couldn't write times to file");
     }
@@ -237,7 +246,7 @@ int main(int argc, char* argv[]) {
 
     // write stats
 
-    fp = fopen("var/stats.json", "w");
+    fp = fopen("stats.json", "w");
     if(fp == nullptr) {
         perror("main: couldn't write stats to file");
     }
