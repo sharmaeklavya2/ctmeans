@@ -2,7 +2,10 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
+#include <vector>
+#include <string>
 
 #include "lib/matrix.h"
 #include "lib/ctmeans.h"
@@ -16,7 +19,7 @@ double get_elapsed(double start_clock, double end_clock) {
     return double(end_clock - start_clock) / CLOCKS_PER_SEC;
 }
 
-void output_vec_vec_to_file(const char* fname, const char* name, int n, int c, const vector<vector<int> >& V) {
+double output_vec_vec_to_file(const char* fname, const char* name, int n, int c, const vector<vector<int> >& V) {
     long long sum = 0;
     int count = 0;
     FILE* fp = fopen(fname, "w");
@@ -33,13 +36,71 @@ void output_vec_vec_to_file(const char* fname, const char* name, int n, int c, c
         fprintf(fp, "\n");
     }
     fclose(fp);
-    double avg = double(sum) / count;
-    printf("Average %s: %lf, %lf, %lf\n", name, avg, avg/n, avg/n/c);
+    return double(sum) / count;
 }
 
 #ifdef DEBUG
 #include <fenv.h>
 #endif
+
+string get_json_dict_template(const char* keys, const char* val_fmts) {
+    string s = "{\n";
+    /*
+    int n=1;
+    for(int i=0; keys[i] != '\0'; ++i) {
+        if(keys[i] == ',') {n++;}
+    }
+    s.reserve(strlen(keys) + strlen(fmts) + 8*n + 4);
+    */
+
+    if(keys[0] == '\0' || val_fmts[0] == '\0') {
+        return "{}\n";
+    }
+
+    char key[50], val_fmt[10];
+    int j1beg=0, j2beg=0;
+    for(int i=0; true; ++i) {
+        char ch1='\0', ch2='\0';
+        while(keys[j1beg] == ' ') {
+            j1beg++;
+        }
+        while(val_fmts[j2beg] == ' ') {
+            j2beg++;
+        }
+        for(int j1off=0; true; ++j1off) {
+            ch1 = keys[j1beg + j1off];
+            if(ch1 == ' ') {
+                continue;
+            }
+            if(ch1 == ',' || ch1 == '\0') {
+                key[j1off] = '\0';
+                j1beg += j1off + 1;
+                break;
+            }
+            else {
+                key[j1off] = ch1;
+            }
+        }
+        for(int j2off=0; true; ++j2off) {
+            ch2 = val_fmts[j2beg + j2off];
+            if(ch2 == ',' || ch2 == '\0') {
+                val_fmt[j2off] = '\0';
+                j2beg += j2off + 1;
+                break;
+            }
+            else {
+                val_fmt[j2off] = ch2;
+            }
+        }
+        s.append("  \"").append(key).append("\": ").append(val_fmt).append(",\n");
+        if(ch1 == '\0' || ch2 == '\0') {
+            break;
+        }
+    }
+    s.pop_back(); s.pop_back();
+    s.append("\n}\n");
+    return s;
+}
 
 int main(int argc, char* argv[]) {
     // parse command-line args
@@ -60,7 +121,6 @@ int main(int argc, char* argv[]) {
         switch(argc) {
         case 9:
             seed = atoi(argv[8]);
-            srand(seed);
         case 8:
             eps_t = atof(argv[7]);
         case 7:
@@ -80,12 +140,29 @@ int main(int argc, char* argv[]) {
         if(eps_obj <= 0.0) {eps_obj = 0.0001;}
         if(max_t <= 0) {max_t = c;}
         if(eps_t <= 0.0) {eps_t = 0.0;}
-        if(seed <= 0) {srand(time(NULL));}
+        if(seed <= 0) {seed = int(time(nullptr));}
+    }
+    srand(seed);
+
+    FILE* fp = NULL;
+
+    // store cmd args
+
+    fp = fopen("var/args.json", "w");
+    if(fp == nullptr) {
+        perror("main: couldn't write args to file");
+    }
+    else {
+        string s = get_json_dict_template(
+            " c,reps,use_kd,max_epochs,eps_obj,max_t, eps_t,seed",
+            "%d,  %d,    %s,        %d, %.10lg,   %d,%.10lg,  %d");
+        fprintf(fp, s.c_str(),
+            c, reps, (use_kd? "true": "false"), max_epochs, eps_obj, max_t, eps_t, seed);
+        fclose(fp);
     }
 
     // read input
 
-    FILE* fp = NULL;
     int n, d;
 
     fp = fopen("var/in.shape.txt", "r");
@@ -103,7 +180,8 @@ int main(int argc, char* argv[]) {
     clock_t start_clock = clock();
     loadtxt("var/in.txt", X);
     clock_t end_clock = clock();
-    printf("Time to load data: %lg\n", get_elapsed(start_clock, end_clock));
+    double time_to_load_data = get_elapsed(start_clock, end_clock);
+    printf("Time to load data: %lg\n", time_to_load_data);
 
     // cluster
 
@@ -112,7 +190,8 @@ int main(int argc, char* argv[]) {
     double obj = model.cluster(use_kd, reps, max_epochs, eps_obj, stderr, 3);
     end_clock = clock();
     printf("Objective: %lg\n", obj);
-    printf("Time to cluster: %lg\n", get_elapsed(start_clock, end_clock));
+    double time_to_cluster = get_elapsed(start_clock, end_clock);
+    printf("Time to cluster: %lg\n", time_to_cluster);
 
     // write output
 
@@ -132,11 +211,42 @@ int main(int argc, char* argv[]) {
         double(flatu.size())/n, double(flatu.size())/n/c);
     end_clock = clock();
 
-    output_vec_vec_to_file("var/sigc.txt", "SigC", n, c, model.SigC);
+    double avg_sigC = output_vec_vec_to_file("var/sigc.txt", "SigC", n, c, model.SigC);
+    printf("Average %s: %lf, %lf, %lf\n", "SigC", avg_sigC, avg_sigC/n, avg_sigC/n/c);
+    double avg_heap_ops = 0;
     if(use_kd) {
-        output_vec_vec_to_file("var/heap_ops.txt", "heap_ops", n, c, model.P);
+        avg_heap_ops = output_vec_vec_to_file("var/heap_ops.txt", "heap_ops", n, c, model.P);
+        printf("Average %s: %lf, %lf, %lf\n", "heap_ops", avg_heap_ops, avg_heap_ops/n, avg_heap_ops/n/c);
     }
-    printf("Time to save: %lg\n", get_elapsed(start_clock, end_clock));
+    double time_to_save = get_elapsed(start_clock, end_clock);
+    printf("Time to save: %lg\n", time_to_save);
 
+    // write times
+
+    fp = fopen("var/times.json", "w");
+    if(fp == nullptr) {
+        perror("main: couldn't write times to file");
+    }
+    else {
+        string s = get_json_dict_template(
+            "load_data,cluster,  save",
+            "   %.10lg, %.10lg,%.10lg");
+        fprintf(fp, s.c_str(), time_to_load_data, time_to_cluster, time_to_save);
+        fclose(fp);
+    }
+
+    // write stats
+
+    fp = fopen("var/stats.json", "w");
+    if(fp == nullptr) {
+        perror("main: couldn't write stats to file");
+    }
+    else {
+        string s = get_json_dict_template(
+            "flatu_size,avg_sigC,avg_heap_ops",
+            "    %.10lg,  %.10lg,      %.10lg");
+        fprintf(fp, s.c_str(), double(flatu.size())/n, avg_sigC/n, avg_heap_ops/n);
+        fclose(fp);
+    }
     return 0;
 }
