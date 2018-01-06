@@ -252,9 +252,9 @@ int main(int argc, char* argv[]) {
     }
     else {
         string s = get_json_dict_template(
-            "flatu_size,avg_sigC,avg_heap_ops",
-            "    %.10lg,  %.10lg,      %.10lg");
-        fprintf(fp, s.c_str(), double(flatu.size())/n, avg_sigC/n, avg_heap_ops/n);
+            "objective,flatu_size,avg_sigC,avg_heap_ops",
+            "   %.10lg,    %.10lg,  %.10lg,      %.10lg");
+        fprintf(fp, s.c_str(), obj, double(flatu.size())/n, avg_sigC/n, avg_heap_ops/n);
         fclose(fp);
     }
     return 0;
