@@ -23,8 +23,6 @@ def main():
         help='Do not color points according to cluster')
     args = parser.parse_args()
 
-    out_dir_path = pjoin(BASE_DIR, 'output', args.out_dir)
-
     with Timer('import modules'):
         import numpy as np
         from matplotlib import pyplot as plt
@@ -32,15 +30,15 @@ def main():
         sns.set()
 
     with Timer('read input, labels and centroids'):
-        X = np.loadtxt(pjoin(out_dir_path, 'in.txt'))
+        X = np.loadtxt(pjoin(args.out_dir, 'in.txt'))
         n, d = X.shape
         try:
-            y = np.loadtxt(pjoin(out_dir_path, 'labels.txt'))
+            y = np.loadtxt(pjoin(args.out_dir, 'labels.txt'))
             assert(y.shape == (n,))
         except FileNotFoundError:
             y = None
         try:
-            C = np.loadtxt(pjoin(out_dir_path, 'centroids.txt'))
+            C = np.loadtxt(pjoin(args.out_dir, 'centroids.txt'))
             assert(C.shape[1] == d)
             c = C.shape[0]
         except FileNotFoundError:
@@ -55,7 +53,7 @@ def main():
 
     start_time = timeit.default_timer()
     try:
-        flatu = np.loadtxt(pjoin(out_dir_path, 'flatu.txt'))
+        flatu = np.loadtxt(pjoin(args.out_dir, 'flatu.txt'))
     except FileNotFoundError:
         flatu = None
     if flatu is not None:
@@ -68,7 +66,7 @@ def main():
         start_time = timeit.default_timer()
         try:
             L = []
-            with open(pjoin(out_dir_path, fname)) as fobj:
+            with open(pjoin(args.out_dir, fname)) as fobj:
                 for line in fobj:
                     if line:
                         L.append([float(x) for x in line.split()])

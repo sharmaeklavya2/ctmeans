@@ -17,16 +17,15 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('dataset')
-    parser.add_argument('out_dir', help='Name of output directory used to store clustering output')
+    parser.add_argument('out_dir', help='Path to output directory used to store clustering output')
     args = parser.parse_args()
 
-    out_dir_path = pjoin(BASE_DIR, 'output', args.out_dir)
-    shutil.rmtree(out_dir_path, ignore_errors=True)
-    os.makedirs(out_dir_path, exist_ok=True)
-    os.symlink(os.path.abspath(args.dataset), pjoin(out_dir_path, 'in.txt'))
+    shutil.rmtree(args.out_dir, ignore_errors=True)
+    os.makedirs(args.out_dir, exist_ok=True)
+    os.symlink(os.path.abspath(args.dataset), pjoin(args.out_dir, 'in.txt'))
     X = np.loadtxt(args.dataset)
     n, d = X.shape
-    with open(pjoin(out_dir_path, 'in.shape.txt'), 'w') as fobj:
+    with open(pjoin(args.out_dir, 'in.shape.txt'), 'w') as fobj:
         print(*(X.shape), file=fobj)
 
 
