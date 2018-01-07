@@ -149,7 +149,8 @@ int main(int argc, char* argv[]) {
     srand(seed);
 
     if(chdir(directory) != 0) {
-        perror("main: couldn't change directory");
+        fprintf(stderr, "Couldn't chdir to %s\n", directory);
+        perror("main");
         return 1;
     }
 
@@ -159,7 +160,8 @@ int main(int argc, char* argv[]) {
 
     fp = fopen("args.json", "w");
     if(fp == nullptr) {
-        perror("main: couldn't write args to file");
+        fprintf(stderr, "Couldn't open args.json\n");
+        perror("main");
     }
     else {
         string s = get_json_dict_template(
@@ -176,7 +178,8 @@ int main(int argc, char* argv[]) {
 
     fp = fopen("in.shape.txt", "r");
     if(fp == NULL) {
-        perror("main: couldn't read shape");
+        fprintf(stderr, "Couldn't open in.shape.txt\n");
+        perror("main");
         return 1;
     }
 #pragma GCC diagnostic push
@@ -234,7 +237,8 @@ int main(int argc, char* argv[]) {
 
     fp = fopen("times.json", "w");
     if(fp == nullptr) {
-        perror("main: couldn't write times to file");
+        fprintf(stderr, "Couldn't open time.json\n");
+        perror("main");
     }
     else {
         string s = get_json_dict_template(
@@ -248,7 +252,8 @@ int main(int argc, char* argv[]) {
 
     fp = fopen("stats.json", "w");
     if(fp == nullptr) {
-        perror("main: couldn't write stats to file");
+        fprintf(stderr, "Couldn't open stats.json\n");
+        perror("main");
     }
     else {
         string s = get_json_dict_template(

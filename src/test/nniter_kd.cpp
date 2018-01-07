@@ -28,10 +28,13 @@ int main() {
     // read shape of matrix
     int n, d;
     FILE* fp = nullptr;
+    const char* srcname = "test/nniter_kd.cpp";
 
-    fp = fopen("fixtures/matrix.shape.txt", "r");
+    const char* fname = "fixtures/matrix.shape.txt";
+    fp = fopen(fname, "r");
     if(fp == NULL) {
-        perror("main: couldn't read shape");
+        fprintf(stderr, "Couldn't read %s\n", fname);
+        perror(srcname);
         return 1;
     }
 #pragma GCC diagnostic push
@@ -47,9 +50,11 @@ int main() {
     NNIterKD nniter(X);
 
     // Save output to a file
-    fp = fopen("var/nniter_kd.txt", "w");
+    fname = "var/nniter_kd.txt";
+    fp = fopen(fname, "w");
     if(fp == NULL) {
-        perror("main: couldn't open file for writing");
+        fprintf(stderr, "Couldn't open %s\n", fname);
+        perror(srcname);
         return 1;
     }
     print_kd_tree(fp, nniter.root, 0);

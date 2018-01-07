@@ -53,6 +53,7 @@ void output(FILE* fp, const Matrix& X) {
 void savetxt(const char* fname, const Matrix& X) {
     FILE* fp = fopen(fname, "w");
     if(fp == NULL) {
+        fprintf(stderr, "Couldn't open %s\n", fname);
         perror("savetxt");
     }
     else {
@@ -75,6 +76,7 @@ void input(FILE* fp, Matrix& X) {
 void loadtxt(const char* fname, Matrix& X) {
     FILE* fp = fopen(fname, "r");
     if(fp == NULL) {
+        fprintf(stderr, "Couldn't open %s\n", fname);
         perror("loadtxt");
     }
     else {

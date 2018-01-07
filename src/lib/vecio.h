@@ -61,6 +61,7 @@ template<class IterT>
 void savetxt(const char* fname, IterT begin, IterT end) {
     FILE* fp = fopen(fname, "w");
     if(fp == NULL) {
+        fprintf(stderr, "Couldn't open %s\n", fname);
         perror("savetxt");
     }
     else {
@@ -89,6 +90,7 @@ template<class T>
 void loadtxt(const char* fname, std::vector<T>& v) {
     FILE* fp = fopen(fname, "r");
     if(fp == NULL) {
+        fprintf(stderr, "Couldn't open %s\n", fname);
         perror("loadtxt");
     }
     else {
