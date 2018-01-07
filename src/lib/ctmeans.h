@@ -52,7 +52,8 @@ public:
         int epochs=300,         // number of iterations in each run of CT-means
         double obj_tol=0.0001,  // relative reduction threshold for termination
         FILE* fp=nullptr,       // file for logging progress
-        int epoch_interval=1    // log in file after every 'epoch_interval' epochs
+        int epoch_interval=1,   // log in file after every 'epoch_interval' epochs
+        bool use_cr=false       // Use carriage return instead of newline
     );
 
 

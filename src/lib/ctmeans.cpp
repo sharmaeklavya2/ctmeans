@@ -184,9 +184,19 @@ double CTMeans::step(bool use_kd, bool update_centroids, bool store_u, int* p_si
     return obj;
 }
 
-double CTMeans::cluster(bool use_kd, int reps, int max_epochs, double obj_tol, FILE* fp, int epoch_interval) {
+double CTMeans::cluster(bool use_kd, int reps, int max_epochs, double obj_tol, FILE* fp, int epoch_interval, bool use_cr) {
     double minobj = std::numeric_limits<double>::infinity();
     std::minstd_rand reng(rand());
+
+    int chars_to_erase = 0;
+    char eol = (use_cr?'\r':'\n');
+    const char space_str_size = 80;
+    char space_str[space_str_size];
+    for(int i=0; i<space_str_size; ++i) {
+        space_str[i] = ' ';
+    }
+    space_str[space_str_size-1] = '\0';
+
     for(int repi=1; repi <= reps; ++repi) {
         init_centroids_rand(reng);
         SigC.push_back(std::vector<int>());
@@ -195,7 +205,7 @@ double CTMeans::cluster(bool use_kd, int reps, int max_epochs, double obj_tol, F
         }
         double obj = std::numeric_limits<double>::infinity();
         int epochi;
-        for(epochi=1; epochi <= max_epochs; ++epochi) {
+        for(epochi=0; epochi < max_epochs; ++epochi) {
             double old_obj = obj;
             int sigc;
             int heap_ops;
@@ -204,18 +214,26 @@ double CTMeans::cluster(bool use_kd, int reps, int max_epochs, double obj_tol, F
                 P.back().push_back(heap_ops);
             }
             SigC.back().push_back(sigc);
-            if(fp != nullptr && epochi % epoch_interval == 1) {
-                fprintf(fp, "ctmeans %d-%d: %lg\n", repi, epochi, obj);
+            if(fp != nullptr && epochi % epoch_interval == 0) {
+                if(use_cr) {
+                    space_str[chars_to_erase] = '\0';
+                    fprintf(fp, "%s\r", space_str);
+                    space_str[chars_to_erase] = ' ';
+                }
+                chars_to_erase = fprintf(fp, "ctmeans %d-%d: %lg%c", repi, epochi+1, obj, eol);
             }
             if((old_obj - obj) < old_obj * obj_tol) {break;}
         }
-        if(fp != nullptr) {
+        if(fp != nullptr && !use_cr) {
             fprintf(fp, "\n");
         }
         if(obj < minobj) {
             minobj = obj;
             std::swap(minC, C);
         }
+    }
+    if(fp != nullptr && use_cr) {
+        fprintf(fp, "\n\n");
     }
     C = minC;
     minobj = step(use_kd, false, true);

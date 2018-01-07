@@ -199,7 +199,7 @@ int main(int argc, char* argv[]) {
 
     CTMeans model(X, c, 2, max_t, eps_t);
     start_clock = clock();
-    double obj = model.cluster(use_kd, reps, max_epochs, eps_obj, stderr, 3);
+    double obj = model.cluster(use_kd, reps, max_epochs, eps_obj, stderr, 1, true);
     end_clock = clock();
     printf("Objective: %lg\n", obj);
     double time_to_cluster = get_elapsed(start_clock, end_clock);
