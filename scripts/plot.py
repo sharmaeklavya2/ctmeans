@@ -13,6 +13,7 @@ import argparse
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pjoin(BASE_DIR, 'scripts'))
 
+import timeit
 from timer import Timer
 
 def main():
@@ -52,32 +53,34 @@ def main():
             plt.scatter(C[:, 0], C[:, 1], s=55, edgecolors='black', facecolors='none', linewidths=1)
     plt.show()
 
-    with Timer('plot flatu'):
-        try:
-            flatu = np.loadtxt(pjoin(out_dir_path, 'flatu.txt'))
-        except FileNotFoundError:
-            flatu = None
-        if flatu is not None:
-            plt.plot(np.arange(0, flatu.shape[0]) / n, flatu)
+    start_time = timeit.default_timer()
+    try:
+        flatu = np.loadtxt(pjoin(out_dir_path, 'flatu.txt'))
+    except FileNotFoundError:
+        flatu = None
     if flatu is not None:
+        plt.plot(np.arange(0, flatu.shape[0]) / n, flatu)
+        plot_time = timeit.default_timer() - start_time
+        print('Time to plot flatu:', plot_time)
         plt.show()
 
     for fname in ('sigc.txt', 'heap_ops.txt'):
-        with Timer('plot ' + fname):
-            try:
-                L = []
-                with open(pjoin(out_dir_path, fname)) as fobj:
-                    for line in fobj:
-                        if line:
-                            L.append([float(x) for x in line.split()])
-            except FileNotFoundError:
-                L = None
-            if L is not None:
-                for l in L:
-                    plt.plot(np.arange(0, len(l)), l, '-o')
-                plt.xlabel('epochs')
-                plt.ylabel(fname.split('.')[0])
+        start_time = timeit.default_timer()
+        try:
+            L = []
+            with open(pjoin(out_dir_path, fname)) as fobj:
+                for line in fobj:
+                    if line:
+                        L.append([float(x) for x in line.split()])
+        except FileNotFoundError:
+            L = None
         if L is not None:
+            for l in L:
+                plt.plot(np.arange(0, len(l)), l, '-o')
+            plt.xlabel('epochs')
+            plt.ylabel(fname.split('.')[0])
+            plot_time = timeit.default_timer() - start_time
+            print('Time to plot {}:'.format(fname), plot_time)
             plt.show()
 
 
