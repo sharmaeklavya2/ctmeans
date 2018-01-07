@@ -34,7 +34,7 @@ all: $(MAIN_OUTPUT) $(BUILDDIR)/gen_gmix test;
 .PHONY: clean
 clean:
 	rm -rf var $(MASTER_BUILDDIR)
-	rm $(MAIN_OUTPUT)
+	rm -f $(MAIN_OUTPUT)
 	find -name "*.pyc" -type f -delete
 	find -name "__pycache__" -type d -delete
 
@@ -85,11 +85,12 @@ $(BUILDDIR)/gen_gmix: $(BUILDDIR)/gen_gmix.o $(LIB_BUILDDIR)/matrix.o
 # Tests
 
 $(TEST_BUILDDIR)/nniter_kd.o: $(TEST_SRCDIR)/nniter_kd.cpp $(LIB_SRCDIR)/nniter_kd.h $(LIB_SRCDIR)/kdtree.h $(COMMON_HEADERS)
-	@mkdir -p var $(TEST_BUILDDIR)
+	@mkdir -p $(TEST_BUILDDIR)
 	$(CXX) -c $< -o $@
 
 $(TEST_BUILDDIR)/nniter_kd: $(TEST_BUILDDIR)/nniter_kd.o $(LIB_BUILDDIR)/nniter_kd.o \
 	$(LIB_BUILDDIR)/kdtree.o $(LIB_BUILDDIR)/matrix.o
+	@mkdir -p var
 	$(CXX) $^ -o $@
 
 TEST_EXES = $(TEST_BUILDDIR)/nniter_kd
