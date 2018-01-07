@@ -22,7 +22,7 @@ sys.path.append(pjoin(BASE_DIR, 'scripts'))
 
 import timeit
 
-def main():
+def main(argv):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('out_dir')
     parser.add_argument('c', help='Number of clusters', type=int)
@@ -32,7 +32,7 @@ def main():
     parser.add_argument('--eps-obj', type=float, default=0.0001)
     parser.add_argument('--fast', action='store_true', default=False,
         help='Use kmeans++ and elkan')
-    args = parser.parse_args()
+    args = parser.parse_args(argv[1:])
 
     os.chdir(args.out_dir)
     if args.seed == -1:
@@ -88,4 +88,4 @@ def main():
         json.dump(data, fobj, indent=2, sort_keys=True)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

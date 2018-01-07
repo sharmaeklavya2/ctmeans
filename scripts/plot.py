@@ -16,12 +16,12 @@ sys.path.append(pjoin(BASE_DIR, 'scripts'))
 import timeit
 from timer import Timer
 
-def main():
+def main(argv):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('out_dir')
     parser.add_argument('--no-color', dest='color', action='store_false', default=True,
         help='Do not color points according to cluster')
-    args = parser.parse_args()
+    args = parser.parse_args(argv[1:])
 
     with Timer('import modules'):
         import numpy as np
@@ -83,4 +83,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

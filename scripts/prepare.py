@@ -14,11 +14,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 import numpy as np
 
-def main():
+def main(argv):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('dataset')
     parser.add_argument('out_dir', help='Path to output directory used to store clustering output')
-    args = parser.parse_args()
+    args = parser.parse_args(argv[1:])
 
     shutil.rmtree(args.out_dir, ignore_errors=True)
     os.makedirs(args.out_dir, exist_ok=True)
@@ -30,4 +30,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
