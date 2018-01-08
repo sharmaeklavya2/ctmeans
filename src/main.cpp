@@ -262,5 +262,7 @@ int main(int argc, char* argv[]) {
         fprintf(fp, s.c_str(), obj, double(flatu.size())/n, avg_sigC/n, avg_heap_ops/n);
         fclose(fp);
     }
+
+    putchar('\n');
     return 0;
 }

@@ -233,7 +233,7 @@ double CTMeans::cluster(bool use_kd, int reps, int max_epochs, double obj_tol, F
         }
     }
     if(fp != nullptr && use_cr) {
-        fprintf(fp, "\n\n");
+        fprintf(fp, "\n");
     }
     C = minC;
     minobj = step(use_kd, false, true);

@@ -87,5 +87,7 @@ def main(argv):
     with open('stats.json', 'w') as fobj:
         json.dump(data, fobj, indent=2, sort_keys=True)
 
+    print()
+
 if __name__ == '__main__':
     main(sys.argv)
