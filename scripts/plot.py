@@ -21,13 +21,23 @@ def main(argv):
     parser.add_argument('out_dir')
     parser.add_argument('--no-color', dest='color', action='store_false', default=True,
         help='Do not color points according to cluster')
+    parser.add_argument('--pca', action='store_true', default=False,
+        help='Use PCA to reduce dimensions. Default is to take the first 2 dimensions')
+    parser.add_argument('--3d', dest='three_dims', action='store_true', default=False,
+        help='Use 3 dimensions')
     args = parser.parse_args(argv[1:])
+    args = parser.parse_args(argv[1:])
+    dims = 3 if args.three_dims else 2
 
     with Timer('import modules'):
         import numpy as np
         from matplotlib import pyplot as plt
+        if dims == 3:
+            from mpl_toolkits.mplot3d import Axes3D
         import seaborn as sns
         sns.set()
+        if args.pca:
+            from sklearn import decomposition
 
     with Timer('read input, labels and centroids'):
         X = np.loadtxt(pjoin(args.out_dir, 'in.txt'))
@@ -44,11 +54,28 @@ def main(argv):
         except FileNotFoundError:
             C = None
 
+    if args.pca:
+        with Timer('apply PCA'):
+            pca = decomposition.PCA(n_components=dims)
+            pca.fit(X)
+            X = pca.transform(X)
+            if C is not None:
+                C = pca.transform(C)
+
     with Timer('plot points'):
-        plt.scatter(X[:, 0], X[:, 1], s=5, c=(y if y is not None and args.color else 'b'))
-        if C is not None:
-            plt.scatter(C[:, 0], C[:, 1], s=35, edgecolors='white', facecolors='none', linewidths=1)
-            plt.scatter(C[:, 0], C[:, 1], s=55, edgecolors='black', facecolors='none', linewidths=1)
+        colors = y if (y is not None and args.color) else 'b'
+        if dims == 3:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.scatter(X[:, 0], X[:, 1], X[:, 2], s=5, c=colors)
+            if C is not None:
+                ax.scatter(C[:, 0], C[:, 1], C[:, 2], s=35, edgecolors='white', facecolors='none', linewidths=1)
+                ax.scatter(C[:, 0], C[:, 1], C[:, 2], s=55, edgecolors='black', facecolors='none', linewidths=1)
+        else:
+            plt.scatter(X[:, 0], X[:, 1], s=5, c=colors)
+            if C is not None:
+                plt.scatter(C[:, 0], C[:, 1], s=35, edgecolors='white', facecolors='none', linewidths=1)
+                plt.scatter(C[:, 0], C[:, 1], s=55, edgecolors='black', facecolors='none', linewidths=1)
     plt.show()
 
     start_time = timeit.default_timer()
