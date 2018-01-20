@@ -38,7 +38,7 @@ def main(argv):
     os.chdir(BASE_DIR)
     data_dir = os.path.relpath(os.path.dirname(os.path.abspath(args.datasets_fpath)), BASE_DIR)
     if args.script:
-        print('set -e\nset -x', BASE_DIR)
+        print('set -e\nset -x')
         print('cd', BASE_DIR)
 
     for data_fname, c in sorted(cluster_map.items(), key=(lambda x: (x[1], x[0]))):
