@@ -59,7 +59,7 @@ def main(argv):
                 scripts.kmeans.main(action2)
             
         for use_kd in (True, False):
-            for algo_name, max_t, eps_t in (('kmeans', 1, 0), ('cmeans', c, 0), ('ctmeans', c, args.eps_t)):
+            for algo_name, max_t, eps_t in (('kmeans', 1, 0), ('ctmeans', c, args.eps_t), ('cmeans', c, 0)):
                 out_dir = pjoin('output', 'bench', algo_name + ('.kd' if use_kd else '.nokd'), data_fname)
                 action1 = ['scripts/prepare.py', pjoin(data_dir, data_fname), out_dir]
                 action2 = ['./ctmeans', out_dir, str(c), str(args.reps), '1' if use_kd else '0',
