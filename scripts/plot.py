@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Run a clustering algorithm and plot the output.
+Plot the output of a clustering algorithm.
 """
 
 import sys
