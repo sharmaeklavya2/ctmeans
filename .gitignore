@@ -7,9 +7,13 @@ __pycache__/
 a.out
 
 secret/
+secret
 output/
+output
 var/
+var
 data/
+data
 
 *~
 *.sw[po]
