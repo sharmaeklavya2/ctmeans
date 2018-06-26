@@ -25,6 +25,9 @@ def main(argv):
         help='Use PCA to reduce dimensions. Default is to take the first 2 dimensions')
     parser.add_argument('--3d', dest='three_dims', action='store_true', default=False,
         help='Use 3 dimensions')
+    parser.add_argument('--no-flatu', dest='flatu', action='store_false', default=True)
+    parser.add_argument('--no-points', dest='points', action='store_false', default=True)
+    args = parser.parse_args(argv[1:])
     args = parser.parse_args(argv[1:])
     args = parser.parse_args(argv[1:])
     dims = 3 if args.three_dims else 2
@@ -62,32 +65,34 @@ def main(argv):
             if C is not None:
                 C = pca.transform(C)
 
-    with Timer('plot points'):
-        colors = y if (y is not None and args.color) else 'b'
-        if dims == 3:
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(X[:, 0], X[:, 1], X[:, 2], s=5, c=colors)
-            if C is not None:
-                ax.scatter(C[:, 0], C[:, 1], C[:, 2], s=35, edgecolors='white', facecolors='none', linewidths=1)
-                ax.scatter(C[:, 0], C[:, 1], C[:, 2], s=55, edgecolors='black', facecolors='none', linewidths=1)
-        else:
-            plt.scatter(X[:, 0], X[:, 1], s=5, c=colors)
-            if C is not None:
-                plt.scatter(C[:, 0], C[:, 1], s=35, edgecolors='white', facecolors='none', linewidths=1)
-                plt.scatter(C[:, 0], C[:, 1], s=55, edgecolors='black', facecolors='none', linewidths=1)
-    plt.show()
-
-    start_time = timeit.default_timer()
-    try:
-        flatu = np.loadtxt(pjoin(args.out_dir, 'flatu.txt'))
-    except FileNotFoundError:
-        flatu = None
-    if flatu is not None:
-        plt.plot(np.arange(0, flatu.shape[0]) / n, flatu)
-        plot_time = timeit.default_timer() - start_time
-        print('Time to plot flatu:', plot_time)
+    if args.points:
+        with Timer('plot points'):
+            colors = y if (y is not None and args.color) else 'b'
+            if dims == 3:
+                fig = plt.figure()
+                ax = fig.add_subplot(111, projection='3d')
+                ax.scatter(X[:, 0], X[:, 1], X[:, 2], s=5, c=colors)
+                if C is not None:
+                    ax.scatter(C[:, 0], C[:, 1], C[:, 2], s=35, edgecolors='white', facecolors='none', linewidths=1)
+                    ax.scatter(C[:, 0], C[:, 1], C[:, 2], s=55, edgecolors='black', facecolors='none', linewidths=1)
+            else:
+                plt.scatter(X[:, 0], X[:, 1], s=5, c=colors)
+                if C is not None:
+                    plt.scatter(C[:, 0], C[:, 1], s=35, edgecolors='white', facecolors='none', linewidths=1)
+                    plt.scatter(C[:, 0], C[:, 1], s=55, edgecolors='black', facecolors='none', linewidths=1)
         plt.show()
+
+    if args.flatu:
+        start_time = timeit.default_timer()
+        try:
+            flatu = np.loadtxt(pjoin(args.out_dir, 'flatu.txt'))
+        except FileNotFoundError:
+            flatu = None
+        if flatu is not None:
+            plt.plot(np.arange(0, flatu.shape[0]) / n, flatu)
+            plot_time = timeit.default_timer() - start_time
+            print('Time to plot flatu:', plot_time)
+            plt.show()
 
     for fname in ('sigc.txt', 'heap_ops.txt'):
         start_time = timeit.default_timer()
