@@ -90,6 +90,8 @@ def main(argv):
             flatu = None
         if flatu is not None:
             plt.plot(np.arange(0, flatu.shape[0]) / n, flatu)
+            plt.xlabel('average important clusters')
+            plt.ylabel('membership value threshold')
             plot_time = timeit.default_timer() - start_time
             print('Time to plot flatu:', plot_time)
             plt.show()
