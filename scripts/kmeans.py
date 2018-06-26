@@ -71,7 +71,7 @@ def main(argv):
 
     # Save output
     save_time = timeit.default_timer()
-    np.savetxt('labels.txt', model.labels_)
+    np.savetxt('labels.txt', model.labels_, fmt='%d')
     np.savetxt('centroids.txt', model.cluster_centers_)
     save_time = timeit.default_timer() - save_time
 
