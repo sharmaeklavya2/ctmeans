@@ -48,13 +48,13 @@ def main(argv):
         try:
             y = np.loadtxt(pjoin(args.out_dir, 'labels.txt'))
             assert(y.shape == (n,))
-        except FileNotFoundError:
+        except OSError:
             y = None
         try:
             C = np.loadtxt(pjoin(args.out_dir, 'centroids.txt'))
             assert(C.shape[1] == d)
             c = C.shape[0]
-        except FileNotFoundError:
+        except OSError:
             C = None
 
     if args.pca:
@@ -86,7 +86,7 @@ def main(argv):
         start_time = timeit.default_timer()
         try:
             flatu = np.loadtxt(pjoin(args.out_dir, 'flatu.txt'))
-        except FileNotFoundError:
+        except OSError:
             flatu = None
         if flatu is not None:
             plt.plot(np.arange(0, flatu.shape[0]) / n, flatu)
