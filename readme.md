@@ -3,7 +3,7 @@
 The CT-means clustering algorithm is an algorithm by [Eklavya Sharma](https://github.com/sharmaeklavya2)
 which uses KD-trees to implement a fast approximation to the C-means fuzzy clustering algorithm.
 You can read about the algorithm here:
-https://sharmaeklavya2.github.io/papers/ctmeans.pdf
+https://sharmaeklavya2.github.io/dl/papers/ctmeans.pdf
 
 This repository contains an implementation of the CT-means clustering algorithm in C++.
 It also contains code for benchmarking it against other algorithms, like K-means and C-means.
